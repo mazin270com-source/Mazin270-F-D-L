@@ -29,8 +29,8 @@ def set_latest_assets():
 
     # Set Game Server Depends of region
 
-    if region == "JP":
-        server_addr_ = "https://game.fate-go.jp"
+    if region == "NA":
+        server_addr_ = "https://game.fate-go.us"
 
     # Get Latest Version of the data!
     version_str = main.get_latest_appver()
