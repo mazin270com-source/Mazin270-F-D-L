@@ -1,7 +1,6 @@
 import main
 import requests
 import user
-import json
 
 
 def topLogin(data: list) -> None:
@@ -10,12 +9,7 @@ def topLogin(data: list) -> None:
     rewards: user.Rewards = data[0]
     login: user.Login = data[1]
     bonus: user.Bonus or str = data[2]
-    with open('login.json', 'r', encoding='utf-8')as f:
-        data22 = json.load(f)
 
-        name1 = data22['cache']['replaced']['userGame'][0]['name']
-        fpids1 = data22['cache']['replaced']['userGame'][0]['friendCode']
-    
     messageBonus = ''
     nl = '\n'
 
@@ -31,136 +25,53 @@ def topLogin(data: list) -> None:
         "content": None,
         "embeds": [
             {
-                "title": "FGO登录系统 - " + main.fate_region,
-                "description": f"登录成功。列出角色信息.\n\n{messageBonus}",
+                "title": "FGO Daily Bonus - " + main.fate_region,
+                "description": f"Scheluded Login Fate/Grand Order.\n\n{messageBonus}",
                 "color": 563455,
                 "fields": [
                     {
-                        "name": "御主名",
-                        "value": f"{name1}",
-                        "inline": True
-                    },
-                    {
-                        "name": "朋友ID",
-                        "value": f"{fpids1}",
-                        "inline": True
-                    },
-                    {
-                        "name": "等级",
+                        "name": "Level",
                         "value": f"{rewards.level}",
                         "inline": True
                     },
                     {
-                        "name": "呼符", 
+                        "name": "Tickets",
                         "value": f"{rewards.ticket}",
                         "inline": True
-                    },                    
+                    },
                     {
-                        "name": "圣晶石",
+                        "name": "Saint Quartz",
                         "value": f"{rewards.stone}",
                         "inline": True
                     },
                     {
-                        "name": "圣晶片",
-                        "value": f"{rewards.sqf01}",
-                        "inline": True
-                    },
-                    {
-                        "name": "金苹果",
-                        "value": f"{rewards.goldenfruit}",
-                        "inline": True
-                    },
-                    {
-                        "name": "银苹果",
-                        "value": f"{rewards.silverfruit}",
-                        "inline": True
-                    },
-                    {
-                        "name": "铜苹果",
-                        "value": f"{rewards.bronzefruit}",
-                        "inline": True
-                    },
-                    {
-                        "name": "蓝苹果",
-                        "value": f"{rewards.bluebronzefruit}",
-                        "inline": True
-                    },
-                    {
-                        "name": "蓝苹果树苗",
-                        "value": f"{rewards.bluebronzesapling}",
-                        "inline": True
-                    },
-                    {
-                        "name": "连续登录天数",
+                        "name": "Login Days",
                         "value": f"{login.login_days}",
                         "inline": True
                     },
                     {
-                        "name": "累计登录天数",
+                        "name": "Total Days",
                         "value": f"{login.total_days}",
                         "inline": True
                     },
                     {
-                        "name": "白方块",
-                        "value": f"{rewards.pureprism}",
-                        "inline": True
-                    },
-                    {
-                        "name": "友情点",
+                        "name": "Total Friend Points",
                         "value": f"{login.total_fp}",
                         "inline": True
                     },
                     {
-                        "name": "今天 获得的友情点",
+                        "name": "Friend Points",
                         "value": f"+{login.add_fp}",
                         "inline": True
                     },
                     {
-                        "name": "当前AP",
-                        "value": f"{login.remaining_ap}",
+                        "name": "Ap Max",
+                        "value": f"{login.act_max}",
                         "inline": True
-                    },
-                    {
-                        "name": "圣杯",
-                        "value": f"{rewards.holygrail}",
-                        "inline": True
-                    },
-                    
-                ],
-                "thumbnail": {
-                    "url": "https://www.fate-go.jp/manga_fgo/images/commnet_chara01.png"
-                }
-            }
-        ],
-        "attachments": []
-    }
-
-    headers = {
-        "Content-Type": "application/json"
-    }
-
-    requests.post(endpoint, json=jsonData, headers=headers)
-
-
-def shop(item: str, quantity: str) -> None:
-    endpoint = main.webhook_discord_url
-    
-    jsonData = {
-        "content": None,
-        "embeds": [
-            {
-                "title": "FGO自动购物系统 - " + main.fate_region,
-                "description": f"购买成功.",
-                "color": 5814783,
-                "fields": [
-                    {
-                        "name": f"商店",
-                        "value": f"消费 {40 * quantity}Ap 购买 {quantity}x {item}",
-                        "inline": False
                     }
                 ],
                 "thumbnail": {
-                    "url": "https://www.fate-go.jp/manga_fgo2/images/commnet_chara10.png"
+                    "url": "https://grandorder.wiki/images/thumb/3/3d/Icon_Item_Saint_Quartz.png/200px-Icon_Item_Saint_Quartz.png"
                 }
             }
         ],
@@ -179,20 +90,16 @@ def drawFP(servants, missions) -> None:
 
     message_mission = ""
     message_servant = ""
-    
+
     if (len(servants) > 0):
         servants_atlas = requests.get(
-            f"https://api.atlasacademy.io/export/JP/basic_svt.json").json()
+            f"https://api.atlasacademy.io/export/JP/basic_svt_lang_en.json").json()
 
         svt_dict = {svt["id"]: svt for svt in servants_atlas}
 
         for servant in servants:
-            objectId = servant.objectId
-            if objectId in svt_dict:
-                svt = svt_dict[objectId]
-                message_servant += f"`{svt['name']}` "
-            else:
-                continue
+            svt = svt_dict[servant.objectId]
+            message_servant += f"`{svt['name']}` "
 
     if(len(missions) > 0):
         for mission in missions:
@@ -202,18 +109,18 @@ def drawFP(servants, missions) -> None:
         "content": None,
         "embeds": [
             {
-                "title": "FGO自动抽卡系统 - " + main.fate_region,
-                "description": f"完成当日免费友情抽卡。列出抽卡结果.\n\n{message_mission}",
+                "title": "FGO Daily Bonus - " + main.fate_region,
+                "description": f"Scheluded Friend Point Fate/Grand Order.\n\n{message_mission}",
                 "color": 5750876,
                 "fields": [
                     {
-                        "name": "友情卡池",
+                        "name": "Gacha Result",
                         "value": f"{message_servant}",
                         "inline": False
                     }
                 ],
                 "thumbnail": {
-                    "url": "https://www.fate-go.jp/manga_fgo/images/commnet_chara02_rv.png"
+                    "url": "https://i.imgur.com/LJMPpP8.png"
                 }
             }
         ],
@@ -225,139 +132,3 @@ def drawFP(servants, missions) -> None:
     }
 
     requests.post(endpoint, json=jsonData, headers=headers)
-
-
-def LTO_Gacha(servants) -> None:
-    endpoint = main.webhook_discord_url
-
-    message_servant = ""
-    
-    if (len(servants) > 0):
-        servants_atlas = requests.get(
-            f"https://api.atlasacademy.io/export/JP/basic_svt.json").json()
-
-        svt_dict = {svt["id"]: svt for svt in servants_atlas}
-
-        for servant in servants:
-            objectId = servant.objectId
-            if objectId in svt_dict:
-                svt = svt_dict[objectId]
-                message_servant += f"`{svt['name']}` "
-            else:
-                continue
-
-    jsonData = {
-        "content": None,
-        "embeds": [
-            {
-                "title": "FGO限定抽卡 - " + main.fate_region,
-                "description": f"完成限定友情抽卡。列出抽卡结果.",
-                "color": 16711680,
-                "fields": [
-                    {
-                        "name": "限定卡池",
-                        "value": f"{message_servant}",
-                        "inline": False
-                    }
-                ],
-                "thumbnail": {
-                    "url": "https://www.fate-go.jp/manga_fgo/images/commnet_chara02_rv.png"
-                }
-            }
-        ],
-        "attachments": []
-    }
-
-    headers = {
-        "Content-Type": "application/json"
-    }
-
-    requests.post(endpoint, json=jsonData, headers=headers)
-
-
-
-def Free_Gacha(servants) -> None:
-    endpoint = main.webhook_discord_url
-    message_servant = ""
-    
-    if (len(servants) > 0):
-        servants_atlas = requests.get(
-            f"https://api.atlasacademy.io/export/JP/basic_svt.json").json()
-
-        svt_dict = {svt["id"]: svt for svt in servants_atlas}
-
-        for servant in servants:
-            objectId = servant.objectId
-            if objectId in svt_dict:
-                svt = svt_dict[objectId]
-                message_servant += f"`{svt['name']}` "
-            else:
-                continue
-
-    jsonData = {
-        "content": None,
-        "embeds": [
-            {
-                "title": "FGO每日免费单抽 - " + main.fate_region,
-                "description": f"完成每日免费单抽。列出抽卡结果.",
-                "color": 65535,
-                "fields": [
-                    {
-                        "name": "圣晶石常驻卡池",
-                        "value": f"{message_servant}",
-                        "inline": False
-                    }
-                ],
-                "thumbnail": {
-                    "url": "https://www.fate-go.jp/manga_fgo2/images/commnet_chara13_rv.png"
-                }
-            }
-        ],
-        "attachments": []
-    }
-
-    headers = {
-        "Content-Type": "application/json"
-    }
-
-    requests.post(endpoint, json=jsonData, headers=headers)
-
-
-
-def Present(name, namegift, object_id_count) -> None:
-    endpoint = main.webhook_discord_url
-    
-    jsonData = {
-        "content": None,
-        "embeds": [
-            {
-                "title": "FGO兑换系统 - JP",
-                "description": "兑换成功",
-                "color": 8388736,
-                "fields": [
-                    {
-                        "name": f"{name}",
-                        "value": f"{namegift} x{object_id_count}",
-                        "inline": False
-                    }
-                ],
-                "thumbnail": {
-                    "url": "https://www.fate-go.jp/manga_fgo2/images/commnet_chara06.png"
-                }
-            }
-        ],
-        "attachments": []
-    }
-
-    headers = {
-        "Content-Type": "application/json"
-    }
-
-    requests.post(endpoint, json=jsonData, headers=headers)
-
-
-
-
-
-
-
